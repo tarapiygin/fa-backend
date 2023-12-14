@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
-@Data
 public class SecurityController {
 
     private UserRepository userRepository;
@@ -25,27 +24,27 @@ public class SecurityController {
     private AuthenticationManager authenticationManager;
     private JwtCore jwtCore;
 
-//    @Autowired
-//    public void setUserRepository(UserRepository userRepository){
-//        this.userRepository = userRepository;
-//    }
-//    @Autowired
-//    public void setPasswordEncoder(PasswordEncoder passwordEncoder){
-//        this.passwordEncoder = passwordEncoder;
-//    }
-//    @Autowired
-//    public void setAuthenticationManager(AuthenticationManager authenticationManager){
-//        this.authenticationManager = authenticationManager;
-//    }
-//
-//    @Autowired
-//    public void setJwtCore(JwtCore jwtCore){
-//        this.jwtCore = jwtCore;
-//    }
+    @Autowired
+    public void setUserRepository(UserRepository userRepository){
+        this.userRepository = userRepository;
+    }
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder){
+        this.passwordEncoder = passwordEncoder;
+    }
+    @Autowired
+    public void setAuthenticationManager(AuthenticationManager authenticationManager){
+        this.authenticationManager = authenticationManager;
+    }
+
+    @Autowired
+    public void setJwtCore(JwtCore jwtCore){
+        this.jwtCore = jwtCore;
+    }
 
     @PostMapping("/signup")
     ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest){
-        if(userRepository.existsUserByUsername(signupRequest.getUsername())){
+        if (userRepository.existsUserByUsername(signupRequest.getUsername())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Choose different name");
         }
 
@@ -60,17 +59,19 @@ public class SecurityController {
     ResponseEntity<?> signin(@RequestBody SigninRequest signinRequest){
         Authentication authentication = null;
         try {
-            authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(signinRequest.getUsername(),
-                            signinRequest.getPassword())
-            );
+
+            UsernamePasswordAuthenticationToken token =  new UsernamePasswordAuthenticationToken(
+                    signinRequest.getUsername(),
+                    signinRequest.getPassword());
+            authentication = authenticationManager.authenticate(token);
+
         } catch (BadCredentialsException e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtCore.generateToken(authentication);
         return ResponseEntity.ok(jwt);
-        }
+    }
 
     }
 
