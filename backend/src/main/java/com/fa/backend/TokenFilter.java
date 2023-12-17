@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +17,10 @@ import java.io.IOException;
 
 @Component
 public class TokenFilter extends OncePerRequestFilter {
+    @Autowired
     private JwtCore jwtCore;
+
+    @Autowired
     private UserDetailsService userDetailsService;
 
     @Override
@@ -32,8 +36,10 @@ public class TokenFilter extends OncePerRequestFilter {
             }
             if (jwt != null) {
                 try {
-                        username = jwtCore.getNameFromJwt(jwt);
+                    username = jwtCore.getNameFromJwt(jwt);
+                    System.out.println(username);
                 } catch (ExpiredJwtException e) {
+                    System.out.println(e.getMessage());
                     //TODO
                 }
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -46,6 +52,7 @@ public class TokenFilter extends OncePerRequestFilter {
                 }
             }
             } catch (Exception e){
+            System.out.println(e);
              //TODO
             }
         filterChain.doFilter(request, response);

@@ -11,8 +11,8 @@ import java.security.Principal;
 public class MainController {
     @GetMapping("/user")
     public String userAccess(Principal principal){
-        if (principal == null)
-            return null;
+        if (principal == null) return null;
+
         return principal.getName();
     }
 }

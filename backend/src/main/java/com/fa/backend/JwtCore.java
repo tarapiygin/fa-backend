@@ -22,6 +22,7 @@ public class JwtCore {
                 .compact();
     }
     public String getNameFromJwt(String token){
-        return Jwts.parser().setSigningKey(secret).parseClaimsJwt(token).getBody().getSubject();
+        String username = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+        return username;
     }
 }
